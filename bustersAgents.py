@@ -23,7 +23,6 @@ import inference
 import busters
 import os
 from game import Configuration
-from wekaI import Weka
 
 prevPacmanPosition = (0,0)
 '''This score is a global variable that is changed in ChooseAction method so that it will save the next value of Score considering wether pac-man is
@@ -82,8 +81,8 @@ class BustersAgent(object):
         self.inferenceModules = [inferenceType(a) for a in ghostAgents]
         self.observeEnable = observeEnable
         self.elapseTimeEnable = elapseTimeEnable
-        self.weka = Weka()
-        self.weka.start_jvm()
+        '''self.weka = Weka()
+        self.weka.start_jvm()'''
 
     def registerInitialState(self, gameState):
         "Initializes beliefs and inference modules"
@@ -124,42 +123,6 @@ class BustersAgent(object):
         print("Succesor: ")  #gameState.generateSuccesor(0, action --> move = DIRECTION.West?)
 
     def printLineData(self, gameState, nextState):
-        import numpy as np
-        global instance_line
-        relation = "\n@relation all-data-pacman"
-        atribute1 = "\n@attribute pacmanDirec {West, East, North, South, Stop}"
-        atribute2 = "\n@attribute pacmanXpos NUMERIC"
-        atribute3 = "\n@attribute pacmanYpos NUMERIC"
-        atribute4 = "\n@attribute LivingGhost1 {False, True}"
-        atribute5 = "\n@attribute LivingGhost2 {False, True}"
-        atribute6 = "\n@attribute LivingGhost3 {False, True}"
-        atribute7 = "\n@attribute LivingGhost4 {False, True}"
-        atribute8 = "\n@attribute ghost1XPos NUMERIC"
-        atribute9 = "\n@attribute ghost1YPos NUMERIC"
-        atribute10 = "\n@attribute ghost2XPos NUMERIC"
-        atribute11 = "\n@attribute ghost2YPos NUMERIC"
-        atribute12 = "\n@attribute ghost3XPos NUMERIC"
-        atribute13 = "\n@attribute ghost3YPos NUMERIC"
-        atribute14 = "\n@attribute ghost4XPos NUMERIC"
-        atribute15 = "\n@attribute ghost4YPos NUMERIC"
-        atribute16 = "\n@attribute ghost1Dist NUMERIC"
-        atribute17 = "\n@attribute ghost2Dist NUMERIC"
-        atribute18 = "\n@attribute ghost3Dist NUMERIC"
-        atribute19 = "\n@attribute ghost4Dist NUMERIC"
-        atribute20 = "\n@attribute currentScore NUMERIC"
-        atribute21 = "\n@attribute pacmanNextXPosition NUMERIC"
-        atribute22 = "\n@attribute pacmanNextYPosition NUMERIC"
-        atribute23 = "\n@attribute nextScore NUMERIC"
-        clase = "\n@attribute action {West, East, North, South, Stop}"
-        instance = [relation, atribute1, atribute2, atribute3, atribute4, atribute5, atribute6, atribute7, atribute8, atribute9, atribute10, atribute11, atribute12, atribute13, atribute14, atribute15, atribute16, atribute17, atribute18, atribute19, atribute20, atribute21, atribute22, atribute23, clase]
-
-        if not os.path.isfile("weka-pacman/test_othermaps_tutorial1.arff"):
-            with open('weka-pacman/test_othermaps_tutorial1.arff', 'w') as file:
-                for i in instance:
-                    file.write(i)
-                file.write("\n@data")
-                file.write("\n")
-
         new_line = []
 
         #Current State Data
@@ -197,9 +160,6 @@ class BustersAgent(object):
 
         instance_line.append(takenAction)
         new_line.append(instance_line)
-
-        with open('weka-pacman/test_othermaps_tutorial1.arff','a') as file:
-            np.savetxt(file, new_line, delimiter=',', fmt='%s')
             
         print(new_line)
 
@@ -226,26 +186,6 @@ class BustersAgent(object):
 
 
     def printFilterData2(self, gameState):
-        import numpy as np
-        relation = "\n@relation filter-data-pacman-manual2"
-        atribute1 = "\n@attribute LivingGhost1 {False, True}"
-        atribute2 = "\n@attribute LivingGhost2 {False, True}"
-        atribute3 = "\n@attribute LivingGhost3 {False, True}"
-        atribute4 = "\n@attribute LivingGhost4 {False, True}"
-        atribute5 = "\n@attribute ghost1Dist NUMERIC"
-        atribute6 = "\n@attribute ghost2Dist NUMERIC"
-        atribute7 = "\n@attribute ghost3Dist NUMERIC"
-        atribute8 = "\n@attribute ghost4Dist NUMERIC"
-        clase = "\n@attribute action {West, East, North, South}"
-        instance = [relation, atribute1, atribute2, atribute3, atribute4, atribute5, atribute6, atribute7, atribute8, clase]
-
-        if not os.path.isfile("weka-pacman/filter-data-pacman-manual2.arff"):
-            with open('weka-pacman/filter-data-pacman-manual2.arff', 'w') as file:
-                for i in instance:
-                    file.write(i)
-                file.write("\n@data")
-                file.write("\n")
-
         new_line = []
         livingGhosts = gameState.getLivingGhosts()[1:]
         new_info = livingGhosts[:]
@@ -259,9 +199,6 @@ class BustersAgent(object):
         new_info = new_info+ghostDistances
         new_info.append(takenAction)
         new_line.append(new_info)
-
-        with open('weka-pacman/filter-data-pacman-manual2.arff','a') as file:
-            np.savetxt(file, new_line, delimiter=',', fmt='%s')
         
         print("filter 2: ", new_info)
 
@@ -426,7 +363,7 @@ class BasicAgentAA(BustersAgent): #############################INTERESA#########
         
     def chooseAction(self, gameState): 
         #Tutorial 01 - IA
-        '''global prevPacmanPosition
+        global prevPacmanPosition
 
         self.countActions = self.countActions + 1
         move = Directions.STOP
@@ -486,19 +423,213 @@ class BasicAgentAA(BustersAgent): #############################INTERESA#########
         if   ( movement == 1 ) and Directions.EAST in legal: move = Directions.EAST
         if   ( movement == 2 ) and Directions.NORTH in legal:   move = Directions.NORTH
         if   ( movement == 3 ) and Directions.SOUTH in legal: move = Directions.SOUTH
-        prevPacmanPosition = pacmanPosition'''
+        prevPacmanPosition = pacmanPosition
+        print("dirNearest: ",gameState.getDirectionNearestGhost())
+        print("relative dist pacdot: ",gameState.getRelativeDistanceNearestPacdot())
+        print("relative dist ghost: ",gameState.getRelativeDistanceNearestGhost())
+        print("Legal actions: ", gameState.getLegalPacmanActions())
+        print("Type of Wall: ", gameState.getTypeOfWall(), wallsAroundPacman)
 
-        #ML model based on Random Forest
-        legal = gameState.getLegalActions(0)
-        x = self.getInstanceToPredict(gameState)
-        p_keyboard = self.weka.predict("/home/ricardo/Escritorio/UNI/5º/ML/practicas/ML-practica1/weka-pacman/classification/final_model/keyboard/keyboard_RandomForest.model", x, "/home/ricardo/Escritorio/UNI/5º/ML/practicas/ML-practica1/weka-pacman/classification/final_model/keyboard/training_keyboard_nonorm_nobalanced_final_nostop.arff")
-        #p_tutorial1 = self.weka.predict("/home/ricardo/Escritorio/UNI/5º/ML/practicas/ML-practica1/weka-pacman/classification/final_model/tutorial1/tutorial1_RandomForest.model", x, "/home/ricardo/Escritorio/UNI/5º/ML/practicas/ML-practica1/weka-pacman/classification/final_model/tutorial1/training_tutorial1_nonorm_nobalanced_var6_nostop.arff")
-        print(p_keyboard)
+        #print(gameState.getDirectionNearestFood())
         
-        prediction = Directions.STOP #to avoid 'prediction' referenced before assigment
-        if   ( p_keyboard == 'West') and Directions.WEST in legal:  prediction = Directions.WEST
-        elif   ( p_keyboard == 'East' ) and Directions.EAST in legal: prediction = Directions.EAST
-        elif   ( p_keyboard == 'North' ) and Directions.NORTH in legal:   prediction = Directions.NORTH
-        elif   ( p_keyboard == 'South' ) and Directions.SOUTH in legal: prediction = Directions.SOUTH
+        return move
+from states import createStates
+class QLearningAgent(BustersAgent): #############################INTERESA#############################
+
+    def registerInitialState(self, gameState):
+        BustersAgent.registerInitialState(self, gameState)
+        self.distancer = Distancer(gameState.data.layout, False)
+        self.countActions = 0
         
-        return prediction
+    """
+      Q-Learning Agent
+
+      Functions you should fill in:
+        - update
+
+      Instance variables you have access to
+        - self.epsilon (exploration prob)
+        - self.alpha (learning rate)
+        - self.discount (discount rate)
+    """
+    def __init__(self, **args):
+        "Initialize Q-values"
+        BustersAgent.__init__(self, **args)
+
+        self.actions = {'East':0, 'West':1, 'North':2, 'South':3, 'Stop':4}
+        self.table_file = open("qtable.txt", "r+")
+#        self.table_file_csv = open("qtable.csv", "r+")        
+        self.q_table = self.readQtable()
+        self.epsilon = 0.2
+        self.alpha = 0.4
+        self.discount = 0.5
+        dir = ['East', 'West', 'North', 'South', 'North-East', 'North-West', 'South-East', 'South-West']
+        dist = ['Close', 'Mid', 'Far']
+        mur = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        self.states = createStates(dir, dist, mur)
+
+    def readQtable(self):
+        "Read qtable from disc"
+        table = self.table_file.readlines()
+        q_table = []
+
+        for i, line in enumerate(table):
+            row = line.split()
+            row = [float(x) for x in row]
+            q_table.append(row)
+
+        return q_table
+
+    def writeQtable(self):
+        "Write qtable to disc"
+        self.table_file.seek(0)
+        self.table_file.truncate()
+        for line in self.q_table:
+            for item in line:
+                self.table_file.write(str(item)+" ")
+            self.table_file.write("\n")
+
+#         self.table_file_csv.seek(0)
+#         self.table_file_csv.truncate()
+#         for line in self.q_table:
+#             for item in line[:-1]:
+#                 self.table_file_csv.write(str(item)+", ")
+#             self.table_file_csv.write(str(line[-1]))                
+#             self.table_file_csv.write("\n")
+
+            
+    def printQtable(self):
+        "Print qtable"
+        for line in self.q_table:
+            print(line)
+        print("\n")    
+            
+    def __del__(self):
+        "Destructor. Invokation at the end of each episode"
+        self.writeQtable()
+        self.table_file.close()
+
+    def computePosition(self, state):
+        currentState = (state.getDirectionNearestGhost(), state.getRelativeDistanceNearestGhost(), state.getTypeOfWall())
+        print(currentState)
+        return self.states.index(currentState)
+
+    def getQValue(self, state, action):
+
+        """
+          Returns Q(state,action)
+          Should return 0.0 if we have never seen a state
+          or the Q node value otherwise
+        """
+        position = self.computePosition(state)
+        action_column = self.actions[action]
+        return self.q_table[position][action_column]
+
+
+    def computeValueFromQValues(self, state):
+        """
+          Returns max_action Q(state,action)
+          where the max is over legal actions.  Note that if
+          there are no legal actions, which is the case at the
+          terminal state, you should return a value of 0.0.
+        """
+        legalActions = state.getLegalPacmanActions()
+        if len(legalActions)==0:
+          return 0
+        return max(self.q_table[self.computePosition(state)])
+
+    def computeActionFromQValues(self, state):
+        """
+          Compute the best action to take in a state.  Note that if there
+          are no legal actions, which is the case at the terminal state,
+          you should return None.
+        """
+        legalActions = state.getLegalPacmanActions()
+        if len(legalActions)==0:
+          return None
+
+        best_actions = [legalActions[0]]
+        best_value = self.getQValue(state, legalActions[0])
+        for action in legalActions:
+            value = self.getQValue(state, action)
+            if value == best_value:
+                best_actions.append(action)
+            if value > best_value:
+                best_actions = [action]
+                best_value = value
+
+        return random.choice(best_actions)
+
+    def getAction(self, state):
+        """
+          Compute the action to take in the current state.  With
+          probability self.epsilon, we should take a random action and
+          take the best policy action otherwise.  Note that if there are
+          no legal actions, which is the case at the terminal state, you
+          should choose None as the action.
+        """
+        # Pick Action
+        legalActions = state.getLegalPacmanActions()
+
+        action = None
+
+        if len(legalActions) == 0:
+             return action
+
+        flip = util.flipCoin(self.epsilon)
+
+        if flip:
+            return random.choice(legalActions)
+        return self.getPolicy(state)
+
+
+    def update(self, state, action, nextState, reward):
+        """
+        The parent class calls this to observe a
+        state = action => nextState and reward transition.
+        You should do your Q-Value update here
+
+        Good Terminal state -> reward 1
+        Bad Terminal state -> reward -1
+        Otherwise -> reward 0
+
+        Q-Learning update:
+
+        if terminal_state:
+        Q(state,action) <- (1-self.alpha) Q(state,action) + self.alpha * (r + 0)
+        else:
+        Q(state,action) <- (1-self.alpha) Q(state,action) + self.alpha * (r + self.discount * max a' Q(nextState, a'))
+
+        """
+        # TRACE for transition and position to update. Comment the following lines if you do not want to see that trace
+#         print("Update Q-table with transition: ", state, action, nextState, reward)
+#         position = self.computePosition(state)
+#         action_column = self.actions[action]
+#         print("Corresponding Q-table cell to update:", position, action_column)
+
+        #MODIFICAR EL STATE QUE ME LLEGA AQUI -> state = ('East', 'Close', 1)
+        
+        '''if currentState == (4,2) or currentState == (4,3):
+            self.q_table[self.computePosition(state)][self.actions[action]] = (1-self.alpha)*self.getQValue(state, action) + self.alpha*reward
+        else:'''
+        
+        self.q_table[self.computePosition(state)][self.actions[action]] = (1-self.alpha)*self.getQValue(state, action) + self.alpha*(reward + self.discount*self.computeValueFromQValues(nextState))
+            
+        # TRACE for updated q-table. Comment the following lines if you do not want to see that trace
+#         print("Q-table:")
+#         self.printQtable()
+
+    def getPolicy(self, state):
+        "Return the best action in the qtable for a given state"
+        return self.computeActionFromQValues(state)
+
+    def getValue(self, state):
+        "Return the highest q value for a given state"
+        return self.computeValueFromQValues(state)
+
+'''print("dirNearest: ",gameState.getDirectionNearestGhost())
+print("relative dist pacdot: ",gameState.getRelativeDistanceNearestPacdot())
+print("relative dist ghost: ",gameState.getRelativeDistanceNearestGhost())
+print("Legal actions: ", gameState.getLegalPacmanActions())
+print("Wall in front: ", gameState.isWallPacmanDirection())
+#print(gameState.getDirectionNearestFood())'''

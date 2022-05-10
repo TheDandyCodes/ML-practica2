@@ -26,6 +26,8 @@ from builtins import zip
 from builtins import str
 from builtins import range
 from builtins import object
+from re import T
+from numpy import true_divide
 from past.utils import old_div
 from game import GameStateData
 from game import Game
@@ -244,6 +246,106 @@ class GameState(object):
         else:
             return None;
 
+    def getDirectionNearestFood(self):
+        """
+        Returns the direction to the nearest food
+        """
+        if(self.getNumFood() > 0):
+            minDistance = 900000
+            pacmanPosition = self.getPacmanPosition()
+            d = 'not'
+            for i in range(self.data.layout.width):
+                for j in range(self.data.layout.height):
+                    if self.hasFood(i, j):
+                        foodPosition = i, j
+                        dx = foodPosition[0]-pacmanPosition[0]
+                        dy = foodPosition[1]-pacmanPosition[1]
+                        distance = util.manhattanDistance(pacmanPosition, foodPosition)
+                        if distance < minDistance and (dx!=0 and dy!=0):
+                            minDistance = distance
+                            if (dx>0 and dy>0 and dx>dy) or (dx>0 and dy<0 and dx>abs(dy)) or (dx>0 and dy==0): d = 'East'
+                            elif (dx<0 and dy>0 and abs(dx)>dy) or (dx<0 and dy<0 and abs(dx)>abs(dy)) or (dx<0 and dy==0): d = 'West'
+                            elif (dx>0 and dy>0 and dx<dy) or (dx<0 and dy>0 and abs(dx)<dy) or (dx==0 and dy>0): d = 'North'
+                            elif (dx>0 and dy<0 and dx<abs(dy)) or (dx<0 and dy<0 and abs(dx)<abs(dy)) or (dx==0 and dy<0): d = 'South'
+                            
+            return (d,dx, dy, distance)
+        else:
+            return None;
+
+    def getRelativeDistanceNearestPacdot(self):
+        """
+        Returns the relative distance to the nearest food
+        """
+        if(self.getNumFood() > 0):
+            minDistance = 900000
+            pacmanPosition = self.getPacmanPosition()
+            for i in range(self.data.layout.width):
+                for j in range(self.data.layout.height):
+                    if self.hasFood(i, j):
+                        foodPosition = i, j
+                        distance = util.manhattanDistance(pacmanPosition, foodPosition)
+                        if distance < minDistance:
+                            minDistance = distance
+            maxDist = self.data.layout.width + self.data.layout.height
+            lot = maxDist/3
+            if minDistance<lot: rd = 'Close'
+            elif lot<=minDistance<lot*2: rd = 'Mid'
+            elif lot*2<=minDistance<lot*3: rd = 'Far'
+            return rd
+
+        else:
+            return None;
+
+    def getRelativeDistanceNearestGhost(self):
+        """
+        Returns the relative distance to the nearest food
+        """
+        nearestGhost = min(d for d in self.data.ghostDistances if d is not None) #Distance - problem whit None type
+        nearestGhostPosition = self.getGhostPositions()[self.data.ghostDistances.index(nearestGhost)]
+        pacmanPosition = self.getPacmanPosition()
+        minDistance = util.manhattanDistance(pacmanPosition, nearestGhostPosition)
+        maxDist = self.data.layout.width + self.data.layout.height
+        lot = maxDist/3
+        if minDistance<lot: rd = 'Close'
+        elif lot<=minDistance<lot*2: rd = 'Mid'
+        elif lot*2<=minDistance<lot*3: rd = 'Far'
+        return rd
+    
+    def getTypeOfWall(self):
+        """
+        If wall in front of pacman in his current direction -> Returns 1
+        If wall not in front of pacman in his current direction -> Returns 0
+        """
+
+        #Walls araound pacman
+        pacmanWallUp = self.getWalls()[self.getPacmanPosition()[0]][self.getPacmanPosition()[1]+1] #If there is a wall in current pacman's position
+        pacmanWallDown = self.getWalls()[self.getPacmanPosition()[0]][self.getPacmanPosition()[1]-1]
+        pacmanWallLeft = self.getWalls()[self.getPacmanPosition()[0]-1][self.getPacmanPosition()[1]]
+        pacmanWallRight = self.getWalls()[self.getPacmanPosition()[0]+1][self.getPacmanPosition()[1]]
+        wallsAroundPacman = (pacmanWallLeft, pacmanWallRight,  pacmanWallUp, pacmanWallDown)
+        print(wallsAroundPacman)
+
+        wallType = {
+
+            (True, False, True, False):1,
+            (False, True, True, False):2,
+            (True, False, False, True):3,
+            (False, True, False, True):4,
+            (False, False, True, False):5,
+            (False, False, False, True):6,
+            (False, False, True, True):7,
+            (True, True, False, False):8,
+            (True, True, True, False):9,
+            (True, True, False, True):10,
+            (True, False, True, True):11,
+            (False, True, True, True):12,
+            (False, False, False, False):13,
+            (True, False, False, False):14,
+            (False, True, False, False):15
+        }
+        
+        return wallType.get(wallsAroundPacman)
+
     def getGhostPositions(self):
         return self.ghostPositions
 
@@ -264,6 +366,25 @@ class GameState(object):
         Returns a noisy distance to each ghost.
         """
         return self.data.ghostDistances
+
+    def getDirectionNearestGhost(self):
+        d = 'not'
+        nearestGhost = min(d for d in self.data.ghostDistances if d is not None) #Distance - problem whit None type
+        nearestGhostPosition = self.getGhostPositions()[self.data.ghostDistances.index(nearestGhost)]
+        pacmanPosition = self.getPacmanPosition()
+        dx = nearestGhostPosition[0]-pacmanPosition[0]
+        dy = nearestGhostPosition[1]-pacmanPosition[1]
+        if (dx>0 and dy==0): d = 'East'
+        elif (dx<0 and dy==0): d = 'West'
+        elif (dx==0 and dy>0): d = 'North'
+        elif (dx==0 and dy<0): d = 'South'
+        elif (dx>0 and dy>0): d = 'North-East'
+        elif (dx<0 and dy>0): d = 'North-West'
+        elif (dx>0 and dy<0): d = 'South-East'
+        elif (dx<0 and dy<0): d = 'South-West'
+        return d
+
+
 
     #############################################
     #             Helper methods:               #

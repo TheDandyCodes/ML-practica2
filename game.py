@@ -619,6 +619,7 @@ class Game(object):
         numAgents = len( self.agents )
         step = 0
         while not self.gameOver: #############################INTERESA#############################
+        #while i <= 1000:
             # Fetch the next agent
             agent = self.agents[agentIndex]
             #if agentIndex == 0: agent.printInfo(self.state.deepCopy()) #Printing Info
@@ -692,13 +693,18 @@ class Game(object):
                     self.unmute()
                     return
             else:
+                currentState = self.state.deepCopy()
                 action = agent.getAction(observation)
-                if agentIndex == 0:
-                    currentState = self.state.deepCopy()
-                    nextState = self.state.generateSuccessor( agentIndex, action ).deepCopy()
-                    #agent.printLineData(currentState,nextState)
-                    '''agent.printFilterData1(self.state.deepCopy())
-                    agent.printFilterData2(self.state.deepCopy())'''
+                nextState = self.state.generateSuccessor( agentIndex, action ).deepCopy()
+                currentScore = currentState.getScore()
+                nextScore = nextState.getScore()
+                reward = nextScore-currentScore
+                if action == 'Stop':
+                    reward = -2
+                if agent == self.agents[0] and str(type(self.agents[0])) == "<class 'bustersAgents.QLearningAgent'>":
+                    
+                    agent.update(currentState, action, nextState, reward)
+                    
             self.unmute()
 
             # Execute the action #HERE
@@ -714,6 +720,7 @@ class Game(object):
             else:
                 self.state = self.state.generateSuccessor( agentIndex, action )
 
+
             # Change the display
             self.display.update( self.state.data )
             ###idx = agentIndex - agentIndex % 2 + 1
@@ -728,6 +735,8 @@ class Game(object):
 
             if _BOINC_ENABLED:
                 boinc.set_fraction_done(self.getProgress())
+            i+=1
+    
 
         #agent.printLineData(self.state.deepCopy())
 
