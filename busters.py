@@ -323,7 +323,7 @@ class GameState(object):
         pacmanWallLeft = self.getWalls()[self.getPacmanPosition()[0]-1][self.getPacmanPosition()[1]]
         pacmanWallRight = self.getWalls()[self.getPacmanPosition()[0]+1][self.getPacmanPosition()[1]]
         wallsAroundPacman = (pacmanWallLeft, pacmanWallRight,  pacmanWallUp, pacmanWallDown)
-        print(wallsAroundPacman)
+        
 
         wallType = {
 

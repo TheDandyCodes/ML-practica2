@@ -424,13 +424,12 @@ class BasicAgentAA(BustersAgent): #############################INTERESA#########
         if   ( movement == 2 ) and Directions.NORTH in legal:   move = Directions.NORTH
         if   ( movement == 3 ) and Directions.SOUTH in legal: move = Directions.SOUTH
         prevPacmanPosition = pacmanPosition
-        print("dirNearest: ",gameState.getDirectionNearestGhost())
+        '''print("dirNearest: ",gameState.getDirectionNearestGhost())
         print("relative dist pacdot: ",gameState.getRelativeDistanceNearestPacdot())
         print("relative dist ghost: ",gameState.getRelativeDistanceNearestGhost())
         print("Legal actions: ", gameState.getLegalPacmanActions())
-        print("Type of Wall: ", gameState.getTypeOfWall(), wallsAroundPacman)
+        print("Type of Wall: ", gameState.getTypeOfWall(), wallsAroundPacman)'''
 
-        #print(gameState.getDirectionNearestFood())
         
         return move
 from states import createStates
@@ -457,12 +456,12 @@ class QLearningAgent(BustersAgent): #############################INTERESA#######
         BustersAgent.__init__(self, **args)
 
         self.actions = {'East':0, 'West':1, 'North':2, 'South':3, 'Stop':4}
-        self.table_file = open("qtable.txt", "r+")
+        self.table_file = open("qtable-definitive.txt", "r+")
 #        self.table_file_csv = open("qtable.csv", "r+")        
         self.q_table = self.readQtable()
-        self.epsilon = 0.2
-        self.alpha = 0.4
-        self.discount = 0.5
+        self.epsilon = 0#0.1
+        self.alpha = 0#0.25
+        self.discount = 0.9
         dir = ['East', 'West', 'North', 'South', 'North-East', 'North-West', 'South-East', 'South-West']
         dist = ['Close', 'Mid', 'Far']
         mur = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
@@ -511,7 +510,7 @@ class QLearningAgent(BustersAgent): #############################INTERESA#######
 
     def computePosition(self, state):
         currentState = (state.getDirectionNearestGhost(), state.getRelativeDistanceNearestGhost(), state.getTypeOfWall())
-        print(currentState)
+        #print(currentState)
         return self.states.index(currentState)
 
     def getQValue(self, state, action):

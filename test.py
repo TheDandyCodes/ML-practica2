@@ -7,5 +7,5 @@ dist = ['Close', 'Mid', 'Far']
 mur = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 states = createStates(dir, dist, mur)
 
-print(len(states))
+print(states.index(('North-East', 'Mid', 13)))
 

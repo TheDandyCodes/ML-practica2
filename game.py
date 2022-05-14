@@ -618,8 +618,8 @@ class Game(object):
         agentIndex = self.startingIndex
         numAgents = len( self.agents )
         step = 0
+        iniNumFood = self.state.getNumFood()
         while not self.gameOver: #############################INTERESA#############################
-        #while i <= 1000:
             # Fetch the next agent
             agent = self.agents[agentIndex]
             #if agentIndex == 0: agent.printInfo(self.state.deepCopy()) #Printing Info
@@ -736,6 +736,9 @@ class Game(object):
             if _BOINC_ENABLED:
                 boinc.set_fraction_done(self.getProgress())
             i+=1
+        finNumFood = self.state.getNumFood()
+        print("Ticks: ",i)
+        print("Food points: ", (iniNumFood-finNumFood)*100)
     
 
         #agent.printLineData(self.state.deepCopy())
